@@ -7,10 +7,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.shelk.steam_api_project.entities.app.AppMap;
+import ru.shelk.steam_api_project.entities.news.NewsDto;
+import ru.shelk.steam_api_project.entities.news.NewsItem;
 import ru.shelk.steam_api_project.interfaces.SteamAppsGateway;
 import ru.shelk.steam_api_project.services.SteamService;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 
 @RestController
@@ -31,10 +32,12 @@ public class Controller {
     }
 
     @GetMapping("/news")
-    public ResponseEntity<List<LinkedHashMap<String, Object>>> getNews(@RequestParam("name") String name,
-                                                    @RequestParam(value = "count", defaultValue = "3") String count) {
+    public ResponseEntity<List<NewsDto>> getNews(@RequestParam("name") String name,
+                                               @RequestParam(value = "count", defaultValue = "3") String count) {
         Long appId = service.getAppIdByName(name);
-        return new ResponseEntity<>(service.getNews(appId, Integer.parseInt(count), 300, "json"), HttpStatus.OK);
+        List<NewsDto> response = service
+                .getNews(appId, Integer.parseInt(count), 300, "json");
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }

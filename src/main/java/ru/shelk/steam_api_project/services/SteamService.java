@@ -2,11 +2,14 @@ package ru.shelk.steam_api_project.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.shelk.steam_api_project.entities.news.NewsDto;
+import ru.shelk.steam_api_project.entities.news.NewsItem;
+import ru.shelk.steam_api_project.entities.news.NewsMapper;
 import ru.shelk.steam_api_project.interfaces.SteamAppsGateway;
 import ru.shelk.steam_api_project.interfaces.SteamNewsGateway;
 
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class SteamService {
@@ -29,9 +32,16 @@ public class SteamService {
                 .getAppid();
     }
 
-    public List<LinkedHashMap<String, Object>> getNews(Long appId, int count, int maxLength, String format) {
-        return (List<LinkedHashMap<String, Object>>) newsGateway.getNews(appId, count, maxLength, format).get("appnews").get("newsitems");
+    public List<NewsDto> getNews(Long appId, int count, int maxLength, String format) {
+        List<NewsItem> list = newsGateway.getNews(appId, count, maxLength, format)
+                .getAppNews()
+                .getNewsItems();
+
+        List<NewsDto> dtoList = list
+                .stream()
+                .map(NewsMapper.INSTANCE::newsItemsToNewsDto)
+                .collect(Collectors.toList());
+
+        return dtoList;
     }
-
-
 }
